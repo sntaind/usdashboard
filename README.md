@@ -30,7 +30,7 @@ A real-time dashboard for monitoring key US economic indicators with interactive
 
 ## Live Demo
 
-🌐 **[View Live Dashboard](https://yourusername.github.io/macro-watchtower/)**
+🌐 **[View Live Dashboard](https://sntaind.github.io/macro-watchtower/)**
 
 ## Local Development
 
