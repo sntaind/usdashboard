@@ -63,18 +63,18 @@ const fetcher = async (url: string) => {
   if (!seriesCode) throw new Error("No series code provided");
 
   if (seriesCode === 'FINRA_MARGIN_DEBT') {
-    // Simple mock data for testing
+    // Simple mock data for testing (in billions)
     const mockData = [
-      { date: "2024-01-01", value: 1000 },
-      { date: "2024-02-01", value: 950 },
-      { date: "2024-03-01", value: 900 },
-      { date: "2024-04-01", value: 850 },
-      { date: "2024-05-01", value: 800 },
-      { date: "2024-06-01", value: 750 },
-      { date: "2024-07-01", value: 700 },
-      { date: "2024-08-01", value: 650 },
-      { date: "2024-09-01", value: 600 },
-      { date: "2024-10-01", value: 550 },
+      { date: "2024-01-01", value: 1000000000000 },
+      { date: "2024-02-01", value: 950000000000 },
+      { date: "2024-03-01", value: 900000000000 },
+      { date: "2024-04-01", value: 850000000000 },
+      { date: "2024-05-01", value: 800000000000 },
+      { date: "2024-06-01", value: 750000000000 },
+      { date: "2024-07-01", value: 700000000000 },
+      { date: "2024-08-01", value: 650000000000 },
+      { date: "2024-09-01", value: 600000000000 },
+      { date: "2024-10-01", value: 550000000000 },
     ];
 
     return {
@@ -156,10 +156,12 @@ function Tile({ label, code, onClick, isSelected }: FredTile & { onClick?: () =>
   const endpoint = code; // Use series code directly instead of API route
   const { data, isLoading, error } = useSWR(endpoint, fetcher, { 
     revalidateOnFocus: false,
-    revalidateOnReconnect: true,
-    retryCount: 3,
-    retryDelay: 2000,
-    dedupingInterval: 30000
+    revalidateOnReconnect: false,
+    retryCount: 2,
+    retryDelay: 1000,
+    dedupingInterval: 60000,
+    refreshInterval: 0,
+    shouldRetryOnError: true
   });
 
   // Add bottom border for tiles in top 4 rows (first 8 tiles)
