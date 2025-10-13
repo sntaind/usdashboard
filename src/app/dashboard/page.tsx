@@ -98,6 +98,49 @@ const fetcher = async (url: string) => {
     };
   }
 
+  if (seriesCode === 'BAMLH0A0HYM2') {
+    // Mock ICE HY OAS data (realistic values)
+    const mockData = [
+      { date: "2023-01-01", value: 4.2 },
+      { date: "2023-02-01", value: 4.1 },
+      { date: "2023-03-01", value: 4.8 },
+      { date: "2023-04-01", value: 4.5 },
+      { date: "2023-05-01", value: 4.3 },
+      { date: "2023-06-01", value: 4.7 },
+      { date: "2023-07-01", value: 4.4 },
+      { date: "2023-08-01", value: 4.6 },
+      { date: "2023-09-01", value: 4.9 },
+      { date: "2023-10-01", value: 5.1 },
+      { date: "2023-11-01", value: 4.8 },
+      { date: "2023-12-01", value: 4.5 },
+      { date: "2024-01-01", value: 4.3 },
+      { date: "2024-02-01", value: 4.4 },
+      { date: "2024-03-01", value: 4.6 },
+      { date: "2024-04-01", value: 4.8 },
+      { date: "2024-05-01", value: 4.7 },
+      { date: "2024-06-01", value: 4.9 },
+      { date: "2024-07-01", value: 5.0 },
+      { date: "2024-08-01", value: 4.8 },
+    ];
+
+    return {
+      series: {
+        id: "BAMLH0A0HYM2",
+        code: "BAMLH0A0HYM2",
+        name: "ICE BofA HY OAS",
+        source: "ICE",
+        frequency: "Daily",
+        unit: "%",
+        lastUpdated: new Date().toISOString(),
+      },
+      points: mockData.map((item, index) => ({
+        id: `ice-${index}`,
+        date: item.date,
+        value: item.value,
+      })),
+    };
+  }
+
   try {
     // Fetch meta and observations from FRED
     const fiveYearsAgo = new Date();
@@ -153,7 +196,7 @@ type FredTile = {
 const TILES: FredTile[] = [
   { label: "Unemployment Rate (UNRATE)", code: "UNRATE" },
   { label: "Inventory/Sales Ratio (ISRATIO)", code: "ISRATIO" },
-  { label: "Secured Overnight Financing Rate (SOFR)", code: "SOFR" },
+  { label: "Federal Funds Rate (FEDFUNDS)", code: "FEDFUNDS" },
   { label: "Industrial Production", code: "INDPRO" },
   { label: "Retail Sales ex Food (RSXFS)", code: "RSXFS" },
   { label: "Consumer Sentiment (UMCSENT)", code: "UMCSENT" },
