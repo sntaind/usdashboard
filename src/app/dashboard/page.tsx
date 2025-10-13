@@ -221,9 +221,15 @@ function Tile({ label, code, onClick, isSelected }: FredTile & { onClick?: () =>
                 domain={["auto", "auto"]}
                 tickLine={false}
                 axisLine={{ stroke: isSelected ? "#fff" : "#000" }}
-                tickFormatter={(ts) => format(new Date(Number(ts)), "yy-MM")}
+                tickFormatter={(ts) => {
+                  const date = new Date(Number(ts));
+                  const year = date.getFullYear();
+                  const month = date.getMonth() + 1;
+                  return `${year}\n${month.toString().padStart(2, '0')}`;
+                }}
                 stroke={isSelected ? "#fff" : "#000"}
-                style={{ fontSize: 10 }}
+                style={{ fontSize: 9 }}
+                height={isSelected ? 40 : 30}
               />
               <YAxis
                 tickLine={false}
