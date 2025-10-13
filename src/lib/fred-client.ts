@@ -1,5 +1,5 @@
 const FRED_BASE = "https://api.stlouisfed.org/fred";
-const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
 export type FredObservation = {
   date: string;
@@ -28,12 +28,8 @@ export async function fetchFredSeriesObservations(seriesId: string, params: Reco
   }
   
   // Fallback to CORS proxy
-  const proxyUrl = `${CORS_PROXY}${url}`;
-  const response = await fetch(proxyUrl, {
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-  });
+  const proxyUrl = `${CORS_PROXY}${encodeURIComponent(url)}`;
+  const response = await fetch(proxyUrl);
   const data = await response.json();
   return data as { observations: FredObservation[] };
 }
@@ -59,12 +55,8 @@ export async function fetchFredSeriesMeta(seriesId: string) {
   }
   
   // Fallback to CORS proxy
-  const proxyUrl = `${CORS_PROXY}${url}`;
-  const response = await fetch(proxyUrl, {
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-  });
+  const proxyUrl = `${CORS_PROXY}${encodeURIComponent(url)}`;
+  const response = await fetch(proxyUrl);
   const data = await response.json();
   return data as { seriess: Array<{ id: string; title: string; frequency: string; units_short?: string; last_updated?: string }> };
 }
