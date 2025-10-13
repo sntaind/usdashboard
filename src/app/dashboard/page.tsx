@@ -59,7 +59,11 @@ const CustomTooltip = ({ active, payload, label, isSelected }: {
 };
 
 const fetcher = async (url: string) => {
-  if (url.includes('/api/finra/margin-debt')) {
+  // Extract series code from URL
+  const seriesCode = url.split('/').pop();
+  if (!seriesCode) throw new Error("No series code provided");
+
+  if (seriesCode === 'FINRA_MARGIN_DEBT') {
     // Mock data for FINRA margin debt
     // Mock data for FINRA margin debt (in billions) - realistic values based on historical data
     const mockData = [
@@ -116,10 +120,6 @@ const fetcher = async (url: string) => {
       })),
     };
   }
-
-  // Extract series code from URL
-  const seriesCode = url.split('/').pop();
-  if (!seriesCode) throw new Error("No series code provided");
 
   try {
     // Fetch meta and observations from FRED
