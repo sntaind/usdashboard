@@ -100,9 +100,16 @@ const fetcher = async (url: string) => {
 
   try {
     // Fetch meta and observations from FRED
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+    const startDate = fiveYearsAgo.toISOString().split('T')[0];
+    
     const [metaResp, obsResp] = await Promise.all([
       fetchFredSeriesMeta(seriesCode),
-      fetchFredSeriesObservations(seriesCode, { sort_order: "asc" }),
+      fetchFredSeriesObservations(seriesCode, { 
+        sort_order: "asc",
+        observation_start: startDate // Only get last 5 years of data
+      }),
     ]);
 
     const meta = metaResp.seriess?.[0];
