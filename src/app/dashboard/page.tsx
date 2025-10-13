@@ -181,7 +181,13 @@ const TILES: FredTile[] = [
 
 function Tile({ label, code, onClick, isSelected }: FredTile & { onClick?: () => void; isSelected?: boolean }) {
   const endpoint = code; // Use series code directly instead of API route
-  const { data, isLoading, error } = useSWR(endpoint, fetcher, { revalidateOnFocus: false });
+  const { data, isLoading, error } = useSWR(endpoint, fetcher, { 
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+    retryCount: 3,
+    retryDelay: 2000,
+    dedupingInterval: 30000
+  });
 
   // Add bottom border for tiles in top 4 rows (first 8 tiles)
   const tileIndex = TILES.findIndex(t => t.label === label);

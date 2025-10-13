@@ -1,5 +1,6 @@
 const FRED_BASE = "https://api.stlouisfed.org/fred";
 const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+const BACKUP_PROXY = "https://cors-anywhere.herokuapp.com/";
 
 export type FredObservation = {
   date: string;
@@ -27,11 +28,19 @@ export async function fetchFredSeriesObservations(seriesId: string, params: Reco
     console.log("Direct fetch failed, trying CORS proxy...");
   }
   
-  // Fallback to CORS proxy
-  const proxyUrl = `${CORS_PROXY}${encodeURIComponent(url)}`;
-  const response = await fetch(proxyUrl);
-  const data = await response.json();
-  return data as { observations: FredObservation[] };
+      // Fallback to CORS proxy
+      try {
+        const proxyUrl = `${CORS_PROXY}${encodeURIComponent(url)}`;
+        const response = await fetch(proxyUrl);
+        const data = await response.json();
+        return data as { observations: FredObservation[] };
+      } catch (proxyError) {
+        console.log("Primary proxy failed, trying backup proxy...");
+        const backupUrl = `${BACKUP_PROXY}${url}`;
+        const response = await fetch(backupUrl);
+        const data = await response.json();
+        return data as { observations: FredObservation[] };
+      }
 }
 
 export async function fetchFredSeriesMeta(seriesId: string) {
@@ -54,9 +63,17 @@ export async function fetchFredSeriesMeta(seriesId: string) {
     console.log("Direct fetch failed, trying CORS proxy...");
   }
   
-  // Fallback to CORS proxy
-  const proxyUrl = `${CORS_PROXY}${encodeURIComponent(url)}`;
-  const response = await fetch(proxyUrl);
-  const data = await response.json();
-  return data as { seriess: Array<{ id: string; title: string; frequency: string; units_short?: string; last_updated?: string }> };
+      // Fallback to CORS proxy
+      try {
+        const proxyUrl = `${CORS_PROXY}${encodeURIComponent(url)}`;
+        const response = await fetch(proxyUrl);
+        const data = await response.json();
+        return data as { seriess: Array<{ id: string; title: string; frequency: string; units_short?: string; last_updated?: string }> };
+      } catch (proxyError) {
+        console.log("Primary proxy failed, trying backup proxy...");
+        const backupUrl = `${BACKUP_PROXY}${url}`;
+        const response = await fetch(backupUrl);
+        const data = await response.json();
+        return data as { seriess: Array<{ id: string; title: string; frequency: string; units_short?: string; last_updated?: string }> };
+      }
 }
