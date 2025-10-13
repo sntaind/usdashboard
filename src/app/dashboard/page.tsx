@@ -59,8 +59,8 @@ const CustomTooltip = ({ active, payload, label, isSelected }: {
 };
 
 const fetcher = async (url: string) => {
-  // Extract series code from URL
-  const seriesCode = url.split('/').pop();
+  // URL is now just the series code directly
+  const seriesCode = url;
   if (!seriesCode) throw new Error("No series code provided");
 
   if (seriesCode === 'FINRA_MARGIN_DEBT') {
@@ -167,7 +167,7 @@ type FredTile = {
 };
 
 const TILES: FredTile[] = [
-  { label: "Initial Claims (ICSA)", code: "ICSA" },
+  { label: "Unemployment Rate (UNRATE)", code: "UNRATE" },
   { label: "Inventory/Sales Ratio (ISRATIO)", code: "ISRATIO" },
   { label: "Secured Overnight Financing Rate (SOFR)", code: "SOFR" },
   { label: "Industrial Production", code: "INDPRO" },
