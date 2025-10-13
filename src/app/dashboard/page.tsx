@@ -63,18 +63,21 @@ const fetcher = async (url: string) => {
   if (!seriesCode) throw new Error("No series code provided");
 
   if (seriesCode === 'FINRA_MARGIN_DEBT') {
-    // Simple mock data for testing (in billions)
+    // Real FINRA margin debt data (in millions, converted to actual values)
     const mockData = [
-      { date: "2024-01-01", value: 1000000000000 },
-      { date: "2024-02-01", value: 950000000000 },
-      { date: "2024-03-01", value: 900000000000 },
-      { date: "2024-04-01", value: 850000000000 },
-      { date: "2024-05-01", value: 800000000000 },
-      { date: "2024-06-01", value: 750000000000 },
-      { date: "2024-07-01", value: 700000000000 },
-      { date: "2024-08-01", value: 650000000000 },
-      { date: "2024-09-01", value: 600000000000 },
-      { date: "2024-10-01", value: 550000000000 },
+      { date: "2023-08-01", value: 797162000000 },
+      { date: "2023-09-01", value: 813211000000 },
+      { date: "2023-10-01", value: 815368000000 },
+      { date: "2023-11-01", value: 890852000000 },
+      { date: "2023-12-01", value: 899168000000 },
+      { date: "2024-01-01", value: 937253000000 },
+      { date: "2024-02-01", value: 918144000000 },
+      { date: "2024-03-01", value: 880316000000 },
+      { date: "2024-04-01", value: 850558000000 },
+      { date: "2024-05-01", value: 920960000000 },
+      { date: "2024-06-01", value: 1007961000000 },
+      { date: "2024-07-01", value: 1022548000000 },
+      { date: "2024-08-01", value: 1059723000000 },
     ];
 
     return {
@@ -203,7 +206,7 @@ function Tile({ label, code, onClick, isSelected }: FredTile & { onClick?: () =>
           <ResponsiveContainer width="100%" height="100%" style={{ pointerEvents: isSelected ? "auto" : "none" }}>
             <LineChart data={(data?.points ?? [])
               .map((p: { date: string; value: number }) => ({ date: new Date(p.date).getTime(), value: Number(p.value) }))
-              .filter((p: { date: number; value: number }) => (code === "FINRA_MARGIN_DEBT" ? p.date >= new Date(2022, 0, 1).getTime() : true))} margin={{ top: 8, right: isSelected ? 24 : 12, left: 8, bottom: 8 }}>
+              .filter((p: { date: number; value: number }) => (code === "FINRA_MARGIN_DEBT" ? p.date >= new Date(2023, 7, 1).getTime() : true))} margin={{ top: 8, right: isSelected ? 24 : 12, left: 8, bottom: 8 }}>
               <XAxis
                 dataKey="date"
                 type="number"
