@@ -59,13 +59,10 @@ const CustomTooltip = ({ active, payload, label, isSelected }: {
 };
 
 const fetcher = async (url: string) => {
-  console.log('Fetcher called with URL:', url);
-  // URL is now just the series code directly
   const seriesCode = url;
   if (!seriesCode) throw new Error("No series code provided");
 
   if (seriesCode === 'FINRA_MARGIN_DEBT') {
-    console.log('Returning mock data for margin debt');
     // Simple mock data for testing
     const mockData = [
       { date: "2024-01-01", value: 1000 },
@@ -99,13 +96,11 @@ const fetcher = async (url: string) => {
   }
 
   try {
-    console.log('Fetching FRED data for:', seriesCode);
     // Fetch meta and observations from FRED
     const [metaResp, obsResp] = await Promise.all([
       fetchFredSeriesMeta(seriesCode),
       fetchFredSeriesObservations(seriesCode, { sort_order: "asc" }),
     ]);
-    console.log('FRED data fetched successfully for:', seriesCode);
 
     const meta = metaResp.seriess?.[0];
     if (!meta) {
