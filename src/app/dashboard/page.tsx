@@ -175,7 +175,6 @@ const TILES: FredTile[] = [
   { label: "Consumer Sentiment (UMCSENT)", code: "UMCSENT" },
   { label: "Cass Freight Shipments", code: "FRGSHPUSM649NCIS" },
   { label: "Margin Debt (FINRA)", code: "FINRA_MARGIN_DEBT" },
-  { label: "ICE BofA IG OAS (BAMLC0A0CM)", code: "BAMLC0A0CM" },
   { label: "ICE BofA HY OAS (BAMLH0A0HYM2)", code: "BAMLH0A0HYM2" },
 ];
 
