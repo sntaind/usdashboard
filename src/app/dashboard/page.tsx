@@ -59,48 +59,25 @@ const CustomTooltip = ({ active, payload, label, isSelected }: {
 };
 
 const fetcher = async (url: string) => {
+  console.log('Fetcher called with URL:', url);
   // URL is now just the series code directly
   const seriesCode = url;
   if (!seriesCode) throw new Error("No series code provided");
 
   if (seriesCode === 'FINRA_MARGIN_DEBT') {
-    // Mock data for FINRA margin debt
-    // Mock data for FINRA margin debt (in billions) - realistic values based on historical data
+    console.log('Returning mock data for margin debt');
+    // Simple mock data for testing
     const mockData = [
-      { date: "2022-01-01", value: 915.3 },
-      { date: "2022-02-01", value: 890.2 },
-      { date: "2022-03-01", value: 865.1 },
-      { date: "2022-04-01", value: 840.5 },
-      { date: "2022-05-01", value: 815.8 },
-      { date: "2022-06-01", value: 790.2 },
-      { date: "2022-07-01", value: 765.4 },
-      { date: "2022-08-01", value: 740.8 },
-      { date: "2022-09-01", value: 715.6 },
-      { date: "2022-10-01", value: 690.3 },
-      { date: "2022-11-01", value: 665.1 },
-      { date: "2022-12-01", value: 640.8 },
-      { date: "2023-01-01", value: 615.2 },
-      { date: "2023-02-01", value: 590.7 },
-      { date: "2023-03-01", value: 565.4 },
-      { date: "2023-04-01", value: 540.1 },
-      { date: "2023-05-01", value: 515.8 },
-      { date: "2023-06-01", value: 490.3 },
-      { date: "2023-07-01", value: 465.7 },
-      { date: "2023-08-01", value: 440.2 },
-      { date: "2023-09-01", value: 415.6 },
-      { date: "2023-10-01", value: 390.8 },
-      { date: "2023-11-01", value: 365.4 },
-      { date: "2023-12-01", value: 340.1 },
-      { date: "2024-01-01", value: 315.7 },
-      { date: "2024-02-01", value: 290.3 },
-      { date: "2024-03-01", value: 265.8 },
-      { date: "2024-04-01", value: 240.5 },
-      { date: "2024-05-01", value: 215.2 },
-      { date: "2024-06-01", value: 190.7 },
-      { date: "2024-07-01", value: 165.4 },
-      { date: "2024-08-01", value: 140.8 },
-      { date: "2024-09-01", value: 115.6 },
-      { date: "2024-10-01", value: 90.3 },
+      { date: "2024-01-01", value: 1000 },
+      { date: "2024-02-01", value: 950 },
+      { date: "2024-03-01", value: 900 },
+      { date: "2024-04-01", value: 850 },
+      { date: "2024-05-01", value: 800 },
+      { date: "2024-06-01", value: 750 },
+      { date: "2024-07-01", value: 700 },
+      { date: "2024-08-01", value: 650 },
+      { date: "2024-09-01", value: 600 },
+      { date: "2024-10-01", value: 550 },
     ];
 
     return {
@@ -122,11 +99,13 @@ const fetcher = async (url: string) => {
   }
 
   try {
+    console.log('Fetching FRED data for:', seriesCode);
     // Fetch meta and observations from FRED
     const [metaResp, obsResp] = await Promise.all([
       fetchFredSeriesMeta(seriesCode),
       fetchFredSeriesObservations(seriesCode, { sort_order: "asc" }),
     ]);
+    console.log('FRED data fetched successfully for:', seriesCode);
 
     const meta = metaResp.seriess?.[0];
     if (!meta) {
