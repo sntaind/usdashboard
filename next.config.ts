@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   },
   basePath: process.env.NODE_ENV === 'production' ? '/macro-watchtower' : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? '/macro-watchtower/' : '',
+  distDir: 'out',
 };
 
 export default nextConfig;

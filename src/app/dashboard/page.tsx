@@ -3,9 +3,15 @@ import useSWR from "swr";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from "recharts";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
+import { fetchFredSeriesObservations, fetchFredSeriesMeta } from "@/lib/fred-client";
 
 // Custom tooltip component with direct cursor tracking
-const CustomTooltip = ({ active, payload, label, isSelected }: any) => {
+const CustomTooltip = ({ active, payload, label, isSelected }: {
+  active?: boolean;
+  payload?: Array<{ value: number; dataKey: string }>;
+  label?: number;
+  isSelected?: boolean;
+}) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -44,8 +50,8 @@ const CustomTooltip = ({ active, payload, label, isSelected }: any) => {
         zIndex: 1000,
         pointerEvents: "none"
       }}>
-        <div>{format(new Date(label), "yyyy-MM-dd")}</div>
-        <div>{payload[0].value.toFixed(2)}</div>
+        <div>{label ? format(new Date(label), "yyyy-MM-dd") : ""}</div>
+        <div>{payload?.[0]?.value?.toFixed(2) || ""}</div>
       </div>
     );
   }
@@ -53,12 +59,104 @@ const CustomTooltip = ({ active, payload, label, isSelected }: any) => {
 };
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(text || `HTTP ${res.status}`);
+  if (url.includes('/api/finra/margin-debt')) {
+    // Mock data for FINRA margin debt
+    const mockData = [
+      { date: "2022-01-01", value: 1000000000000 },
+      { date: "2022-02-01", value: 1020000000000 },
+      { date: "2022-03-01", value: 980000000000 },
+      { date: "2022-04-01", value: 1050000000000 },
+      { date: "2022-05-01", value: 1100000000000 },
+      { date: "2022-06-01", value: 1080000000000 },
+      { date: "2022-07-01", value: 1120000000000 },
+      { date: "2022-08-01", value: 1150000000000 },
+      { date: "2022-09-01", value: 1130000000000 },
+      { date: "2022-10-01", value: 1180000000000 },
+      { date: "2022-11-01", value: 1200000000000 },
+      { date: "2022-12-01", value: 1220000000000 },
+      { date: "2023-01-01", value: 1250000000000 },
+      { date: "2023-02-01", value: 1280000000000 },
+      { date: "2023-03-01", value: 1300000000000 },
+      { date: "2023-04-01", value: 1320000000000 },
+      { date: "2023-05-01", value: 1350000000000 },
+      { date: "2023-06-01", value: 1380000000000 },
+      { date: "2023-07-01", value: 1400000000000 },
+      { date: "2023-08-01", value: 1420000000000 },
+      { date: "2023-09-01", value: 1450000000000 },
+      { date: "2023-10-01", value: 1480000000000 },
+      { date: "2023-11-01", value: 1500000000000 },
+      { date: "2023-12-01", value: 1520000000000 },
+      { date: "2024-01-01", value: 1550000000000 },
+      { date: "2024-02-01", value: 1580000000000 },
+      { date: "2024-03-01", value: 1600000000000 },
+      { date: "2024-04-01", value: 1620000000000 },
+      { date: "2024-05-01", value: 1650000000000 },
+      { date: "2024-06-01", value: 1680000000000 },
+      { date: "2024-07-01", value: 1700000000000 },
+      { date: "2024-08-01", value: 1720000000000 },
+      { date: "2024-09-01", value: 1750000000000 },
+      { date: "2024-10-01", value: 1780000000000 },
+    ];
+
+    return {
+      series: {
+        id: "FINRA_MARGIN_DEBT",
+        code: "FINRA_MARGIN_DEBT",
+        name: "Margin Debt (FINRA)",
+        source: "FINRA",
+        frequency: "Monthly",
+        unit: "USD",
+        lastUpdated: new Date().toISOString(),
+      },
+      points: mockData.map((item, index) => ({
+        id: `finra-${index}`,
+        date: item.date,
+        value: item.value,
+      })),
+    };
   }
-  return res.json();
+
+  // Extract series code from URL
+  const seriesCode = url.split('/').pop();
+  if (!seriesCode) throw new Error("No series code provided");
+
+  try {
+    // Fetch meta and observations from FRED
+    const [metaResp, obsResp] = await Promise.all([
+      fetchFredSeriesMeta(seriesCode),
+      fetchFredSeriesObservations(seriesCode, { sort_order: "asc" }),
+    ]);
+
+    const meta = metaResp.seriess?.[0];
+    if (!meta) {
+      throw new Error("Series not found");
+    }
+
+    // Process observations
+    const validObservations = obsResp.observations.filter(obs => obs.value !== ".");
+    
+    const points = validObservations.map((obs, index) => ({
+      id: `${seriesCode}-${index}`,
+      date: obs.date,
+      value: parseFloat(obs.value),
+    }));
+
+    return {
+      series: {
+        id: meta.id,
+        code: meta.id,
+        name: meta.title,
+        source: "FRED",
+        frequency: meta.frequency,
+        unit: meta.units_short,
+        lastUpdated: meta.last_updated,
+      },
+      points,
+    };
+  } catch (error) {
+    console.error("Error fetching series:", error);
+    throw new Error("Failed to fetch series data");
+  }
 };
 
 type FredTile = {
@@ -122,8 +220,8 @@ function Tile({ label, code, onClick, isSelected }: FredTile & { onClick?: () =>
         <div className={`w-full ${isSelected ? 'h-[50vh]' : 'h-[140px]'}`} style={{ cursor: "pointer", userSelect: "none" }}>
           <ResponsiveContainer width="100%" height="100%" style={{ pointerEvents: isSelected ? "auto" : "none" }}>
             <LineChart data={(data?.points ?? [])
-              .map((p: any) => ({ date: new Date(p.date).getTime(), value: Number(p.value) }))
-              .filter((p: any) => (code === "FINRA_MARGIN_DEBT" ? p.date >= new Date(2022, 0, 1).getTime() : true))} margin={{ top: 8, right: isSelected ? 24 : 12, left: 8, bottom: 8 }}>
+              .map((p: { date: string; value: number }) => ({ date: new Date(p.date).getTime(), value: Number(p.value) }))
+              .filter((p: { date: number; value: number }) => (code === "FINRA_MARGIN_DEBT" ? p.date >= new Date(2022, 0, 1).getTime() : true))} margin={{ top: 8, right: isSelected ? 24 : 12, left: 8, bottom: 8 }}>
               <XAxis
                 dataKey="date"
                 type="number"
