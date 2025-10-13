@@ -180,7 +180,7 @@ const TILES: FredTile[] = [
 ];
 
 function Tile({ label, code, onClick, isSelected }: FredTile & { onClick?: () => void; isSelected?: boolean }) {
-  const endpoint = code === "FINRA_MARGIN_DEBT" ? "/api/finra/margin-debt" : (code ? `/api/series/${encodeURIComponent(code)}` : null);
+  const endpoint = code; // Use series code directly instead of API route
   const { data, isLoading, error } = useSWR(endpoint, fetcher, { revalidateOnFocus: false });
 
   // Add bottom border for tiles in top 4 rows (first 8 tiles)
