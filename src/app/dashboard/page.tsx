@@ -225,11 +225,13 @@ function Tile({ label, code, onClick, isSelected }: FredTile & { onClick?: () =>
                   const date = new Date(Number(ts));
                   const year = date.getFullYear();
                   const month = date.getMonth() + 1;
-                  return `${year}\n${month.toString().padStart(2, '0')}`;
+                  return `${year}-${month.toString().padStart(2, '0')}`;
                 }}
                 stroke={isSelected ? "#fff" : "#000"}
-                style={{ fontSize: 9 }}
-                height={isSelected ? 40 : 30}
+                style={{ fontSize: 8 }}
+                height={isSelected ? 35 : 25}
+                angle={-45}
+                textAnchor="end"
               />
               <YAxis
                 tickLine={false}
