@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Macroeconomics Watchtower</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            max-width: 800px;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: normal;
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+        .description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #ccc;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .feature {
+            background-color: #111;
+            padding: 1rem;
+            border: 1px solid #333;
+            border-radius: 4px;
+        }
+        .feature h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+        .feature p {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        .cta {
+            margin-top: 2rem;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #fff;
+            color: #000;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #ccc;
+        }
+        .metrics {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #999;
+        }
+        .metrics ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>US Macroeconomics Watchtower</h1>
+        
+        <div class="description">
+            Real-time monitoring of key US economic indicators with interactive charts and data visualization.
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>📊 Real-time Data</h3>
+                <p>Live data from FRED API with automatic updates</p>
+            </div>
+            <div class="feature">
+                <h3>📈 Interactive Charts</h3>
+                <p>Click to zoom and explore detailed time series</p>
+            </div>
+            <div class="feature">
+                <h3>🎯 Key Metrics</h3>
+                <p>Essential economic indicators in one dashboard</p>
+            </div>
+            <div class="feature">
+                <h3>📱 Responsive Design</h3>
+                <p>Works on desktop, tablet, and mobile devices</p>
+            </div>
+        </div>
+        
+        <div class="cta">
+            <a href="/dashboard/" class="btn">View Dashboard</a>
+        </div>
+        
+        <div class="metrics">
+            <h3>Monitored Metrics:</h3>
+            <ul>
+                <li>• Initial Claims (ICSA)</li>
+                <li>• Inventory/Sales Ratio</li>
+                <li>• Secured Overnight Financing Rate</li>
+                <li>• Industrial Production</li>
+                <li>• Retail Sales ex Food</li>
+                <li>• Consumer Sentiment</li>
+                <li>• Cass Freight Shipments</li>
+                <li>• Margin Debt (FINRA)</li>
+                <li>• ICE BofA IG OAS</li>
+                <li>• ICE BofA HY OAS</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

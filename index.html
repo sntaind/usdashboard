@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Macroeconomics Watchtower</title>
+    <meta http-equiv="refresh" content="0; url=/dashboard/">
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .loading {
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+        }
+        .spinner {
+            border: 2px solid #333;
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>US MACROECONOMICS WATCHTOWER</h1>
+        <div class="spinner"></div>
+        <div class="loading">Loading Dashboard...</div>
+        <p>If you are not redirected automatically, <a href="/dashboard/" style="color: #fff;">click here</a>.</p>
+    </div>
+</body>
+</html>
