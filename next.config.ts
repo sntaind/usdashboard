@@ -6,8 +6,6 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true
   },
-  basePath: process.env.NODE_ENV === 'production' ? '/macro-watchtower' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/macro-watchtower/' : '',
 };
 
 export default nextConfig;
