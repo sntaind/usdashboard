@@ -42,3 +42,4 @@ npx serve . -p 8000
 
 ---
 **Macro Watchtower v0.1.0** - US 경제 지표 모니터링 대시보드
+

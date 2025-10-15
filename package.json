@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:netlify": "cp next.config.netlify.ts next.config.ts && next build && zip -r macro-watchtower-netlify-$(date +%Y-%m-%d).zip out/ netlify.toml _headers _redirects -x \"*.DS_Store\" \"*/node_modules/*\" && git checkout next.config.ts",
     "start": "next start",
     "lint": "eslint",
     "electron": "electron .",
@@ -23,6 +24,7 @@
     "swr": "^2.3.6",
     "tailwind-merge": "^3.3.1",
     "xlsx": "^0.18.5",
+    "yahoo-finance2": "^2.13.3",
     "zod": "^4.1.12"
   },
   "devDependencies": {

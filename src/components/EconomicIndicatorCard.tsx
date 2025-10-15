@@ -63,3 +63,4 @@ export function EconomicIndicatorCard({
     </Card>
   );
 }
+

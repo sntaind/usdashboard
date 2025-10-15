@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: 'export', // Commented out for local development
+  output: 'export', // Enabled for Netlify deployment
   trailingSlash: true,
   images: {
     unoptimized: true

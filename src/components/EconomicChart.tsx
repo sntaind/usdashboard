@@ -86,3 +86,4 @@ export function EconomicChart({ seriesId, title, color = "#3b82f6", height = 400
     </div>
   );
 }
+

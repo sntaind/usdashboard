@@ -38,3 +38,4 @@ export function useEconomicData(seriesId: string, limit: number = 100) {
     isLoading,
   };
 }
+

@@ -15,9 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "US MACROECONOMICS WATCHTOWER",
   description: "Real-time US macroeconomic indicators dashboard",
-  icons: {
-    icon: "/favicon.svg",
-  },
 };
 
 export default function RootLayout({

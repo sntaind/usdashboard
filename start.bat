@@ -5,3 +5,4 @@ echo ⏹️  종료하려면 Ctrl+C를 누르세요
 echo.
 python -m http.server 8000
 pause
+
