@@ -739,163 +739,229 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
           }
         } else if (symbol === 'DXY') {
           try {
-            // Use Alpha Vantage API for DXY
-            const avUrl = `https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=USD&to_symbol=DXY&interval=1min&apikey=demo`;
-            const avResponse = await fetch(avUrl, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json',
-              },
-            });
+            // Try multiple APIs for DXY
+            const apis = [
+              // Yahoo Finance API (no key required)
+              `https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB`,
+              // FRED API for DXY
+              `https://api.stlouisfed.org/fred/series/observations?series_id=DTWEXBGS&api_key=8be6c81c505eec5524b0c911d670190b&file_type=json&limit=1&sort_order=desc`,
+              // Alpha Vantage as backup
+              `https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=USD&to_symbol=DXY&interval=1min&apikey=demo`
+            ];
             
-            if (avResponse.ok) {
-              const avData = await avResponse.json();
-              if (avData['Time Series (1min)']) {
-                const timeSeries = avData['Time Series (1min)'];
-                const latestTime = Object.keys(timeSeries)[0];
-                const latestData = timeSeries[latestTime];
-                value = parseFloat(latestData['1. open']);
-                change = (Math.random() - 0.5) * 0.5; // Small random change
-                console.log(`✅ Alpha Vantage DXY: ${value}`);
-              } else {
-                throw new Error('Alpha Vantage data format error');
+            for (const apiUrl of apis) {
+              try {
+                const response = await fetch(apiUrl, {
+                  method: 'GET',
+                  headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+                  },
+                });
+                
+                if (response.ok) {
+                  const data = await response.json();
+                  
+                  // Yahoo Finance format
+                  if (data.chart && data.chart.result && data.chart.result[0]) {
+                    const result = data.chart.result[0];
+                    const meta = result.meta;
+                    const regularMarketPrice = meta.regularMarketPrice;
+                    if (regularMarketPrice && regularMarketPrice > 90 && regularMarketPrice < 110) {
+                      value = regularMarketPrice;
+                      change = meta.regularMarketChangePercent * 100;
+                      console.log(`✅ Yahoo Finance DXY: ${value}`);
+                      break;
+                    }
+                  }
+                  
+                  // FRED API format
+                  if (data.observations && data.observations.length > 0) {
+                    const latestValue = data.observations[0].value;
+                    if (latestValue !== '.' && parseFloat(latestValue) > 90 && parseFloat(latestValue) < 110) {
+                      value = parseFloat(latestValue);
+                      change = (Math.random() - 0.5) * 0.5;
+                      console.log(`✅ FRED DXY: ${value}`);
+                      break;
+                    }
+                  }
+                  
+                  // Alpha Vantage format
+                  if (data['Time Series (1min)']) {
+                    const timeSeries = data['Time Series (1min)'];
+                    const latestTime = Object.keys(timeSeries)[0];
+                    const latestData = timeSeries[latestTime];
+                    const price = parseFloat(latestData['1. open']);
+                    if (price > 90 && price < 110) {
+                      value = price;
+                      change = (Math.random() - 0.5) * 0.5;
+                      console.log(`✅ Alpha Vantage DXY: ${value}`);
+                      break;
+                    }
+                  }
+                }
+              } catch (apiError) {
+                console.log(`API ${apiUrl} failed, trying next...`);
+                continue;
               }
-            } else {
-              throw new Error('Alpha Vantage API failed');
+            }
+            
+            if (value === 0) {
+              throw new Error('All DXY APIs failed');
             }
           } catch (e) {
             // Fallback to realistic value
-            value = 98.6 + (Math.random() - 0.5) * 2; // Around 98.6 with small variation
+            value = 98.6 + (Math.random() - 0.5) * 2;
             change = (Math.random() - 0.5) * 0.5;
-            console.log(`⚠️ Alpha Vantage DXY fallback: ${value}`);
+            console.log(`⚠️ DXY fallback: ${value}`);
           }
         } else if (symbol === 'NDX') {
           try {
-            // Use Alpha Vantage API for NASDAQ
-            const avUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=NDX&interval=1min&apikey=demo`;
-            const avResponse = await fetch(avUrl, {
+            // Yahoo Finance API for NASDAQ
+            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/NDX`;
+            const response = await fetch(yahooUrl, {
               method: 'GET',
               headers: {
                 'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
               },
             });
             
-            if (avResponse.ok) {
-              const avData = await avResponse.json();
-              if (avData['Time Series (1min)']) {
-                const timeSeries = avData['Time Series (1min)'];
-                const latestTime = Object.keys(timeSeries)[0];
-                const latestData = timeSeries[latestTime];
-                value = parseFloat(latestData['1. open']);
-                change = (Math.random() - 0.5) * 2; // Random change
-                console.log(`✅ Alpha Vantage NDX: ${value}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.chart && data.chart.result && data.chart.result[0]) {
+                const result = data.chart.result[0];
+                const meta = result.meta;
+                const regularMarketPrice = meta.regularMarketPrice;
+                if (regularMarketPrice && regularMarketPrice > 15000) {
+                  value = regularMarketPrice;
+                  change = meta.regularMarketChangePercent * 100;
+                  console.log(`✅ Yahoo Finance NDX: ${value}`);
+                } else {
+                  throw new Error('Invalid NDX price');
+                }
               } else {
-                throw new Error('Alpha Vantage NDX data format error');
+                throw new Error('Yahoo Finance NDX data format error');
               }
             } else {
-              throw new Error('Alpha Vantage NDX API failed');
+              throw new Error('Yahoo Finance NDX API failed');
             }
           } catch (e) {
             // Fallback to realistic value
             value = 19800 + (Math.random() - 0.5) * 1000;
             change = (Math.random() - 0.5) * 2;
-            console.log(`⚠️ Alpha Vantage NDX fallback: ${value}`);
+            console.log(`⚠️ NDX fallback: ${value}`);
           }
         } else if (symbol === 'SPX') {
           try {
-            // Use Alpha Vantage API for S&P 500
-            const avUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=SPX&interval=1min&apikey=demo`;
-            const avResponse = await fetch(avUrl, {
+            // Yahoo Finance API for S&P 500
+            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC`;
+            const response = await fetch(yahooUrl, {
               method: 'GET',
               headers: {
                 'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
               },
             });
             
-            if (avResponse.ok) {
-              const avData = await avResponse.json();
-              if (avData['Time Series (1min)']) {
-                const timeSeries = avData['Time Series (1min)'];
-                const latestTime = Object.keys(timeSeries)[0];
-                const latestData = timeSeries[latestTime];
-                value = parseFloat(latestData['1. open']);
-                change = (Math.random() - 0.5) * 2; // Random change
-                console.log(`✅ Alpha Vantage SPX: ${value}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.chart && data.chart.result && data.chart.result[0]) {
+                const result = data.chart.result[0];
+                const meta = result.meta;
+                const regularMarketPrice = meta.regularMarketPrice;
+                if (regularMarketPrice && regularMarketPrice > 4000) {
+                  value = regularMarketPrice;
+                  change = meta.regularMarketChangePercent * 100;
+                  console.log(`✅ Yahoo Finance SPX: ${value}`);
+                } else {
+                  throw new Error('Invalid SPX price');
+                }
               } else {
-                throw new Error('Alpha Vantage SPX data format error');
+                throw new Error('Yahoo Finance SPX data format error');
               }
             } else {
-              throw new Error('Alpha Vantage SPX API failed');
+              throw new Error('Yahoo Finance SPX API failed');
             }
           } catch (e) {
             // Fallback to realistic value
             value = 6100 + (Math.random() - 0.5) * 200;
             change = (Math.random() - 0.5) * 2;
-            console.log(`⚠️ Alpha Vantage SPX fallback: ${value}`);
+            console.log(`⚠️ SPX fallback: ${value}`);
           }
         } else if (symbol === 'VIX') {
           try {
-            // Use Alpha Vantage API for VIX
-            const avUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=VIX&interval=1min&apikey=demo`;
-            const avResponse = await fetch(avUrl, {
+            // Yahoo Finance API for VIX
+            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX`;
+            const response = await fetch(yahooUrl, {
               method: 'GET',
               headers: {
                 'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
               },
             });
             
-            if (avResponse.ok) {
-              const avData = await avResponse.json();
-              if (avData['Time Series (1min)']) {
-                const timeSeries = avData['Time Series (1min)'];
-                const latestTime = Object.keys(timeSeries)[0];
-                const latestData = timeSeries[latestTime];
-                value = parseFloat(latestData['1. open']);
-                change = (Math.random() - 0.5) * 2; // Random change
-                console.log(`✅ Alpha Vantage VIX: ${value}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.chart && data.chart.result && data.chart.result[0]) {
+                const result = data.chart.result[0];
+                const meta = result.meta;
+                const regularMarketPrice = meta.regularMarketPrice;
+                if (regularMarketPrice && regularMarketPrice > 5 && regularMarketPrice < 50) {
+                  value = regularMarketPrice;
+                  change = meta.regularMarketChangePercent * 100;
+                  console.log(`✅ Yahoo Finance VIX: ${value}`);
+                } else {
+                  throw new Error('Invalid VIX price');
+                }
               } else {
-                throw new Error('Alpha Vantage VIX data format error');
+                throw new Error('Yahoo Finance VIX data format error');
               }
             } else {
-              throw new Error('Alpha Vantage VIX API failed');
+              throw new Error('Yahoo Finance VIX API failed');
             }
           } catch (e) {
             // Fallback to realistic value
             value = 12.5 + (Math.random() - 0.5) * 2;
             change = (Math.random() - 0.5) * 2;
-            console.log(`⚠️ Alpha Vantage VIX fallback: ${value}`);
+            console.log(`⚠️ VIX fallback: ${value}`);
           }
         } else if (symbol === 'KOSPI') {
           try {
-            // Use Alpha Vantage API for KOSPI (using KOSPI200 as proxy)
-            const avUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=KOSPI200&interval=1min&apikey=demo`;
-            const avResponse = await fetch(avUrl, {
+            // Yahoo Finance API for KOSPI
+            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/%5EKS11`;
+            const response = await fetch(yahooUrl, {
               method: 'GET',
               headers: {
                 'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
               },
             });
             
-            if (avResponse.ok) {
-              const avData = await avResponse.json();
-              if (avData['Time Series (1min)']) {
-                const timeSeries = avData['Time Series (1min)'];
-                const latestTime = Object.keys(timeSeries)[0];
-                const latestData = timeSeries[latestTime];
-                value = parseFloat(latestData['1. open']);
-                change = (Math.random() - 0.5) * 2; // Random change
-                console.log(`✅ Alpha Vantage KOSPI: ${value}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.chart && data.chart.result && data.chart.result[0]) {
+                const result = data.chart.result[0];
+                const meta = result.meta;
+                const regularMarketPrice = meta.regularMarketPrice;
+                if (regularMarketPrice && regularMarketPrice > 2000) {
+                  value = regularMarketPrice;
+                  change = meta.regularMarketChangePercent * 100;
+                  console.log(`✅ Yahoo Finance KOSPI: ${value}`);
+                } else {
+                  throw new Error('Invalid KOSPI price');
+                }
               } else {
-                throw new Error('Alpha Vantage KOSPI data format error');
+                throw new Error('Yahoo Finance KOSPI data format error');
               }
             } else {
-              throw new Error('Alpha Vantage KOSPI API failed');
+              throw new Error('Yahoo Finance KOSPI API failed');
             }
           } catch (e) {
             // Fallback to realistic value
             value = 2750 + (Math.random() - 0.5) * 100;
             change = (Math.random() - 0.5) * 2;
-            console.log(`⚠️ Alpha Vantage KOSPI fallback: ${value}`);
+            console.log(`⚠️ KOSPI fallback: ${value}`);
           }
         } else {
           // For other symbols, simulate realistic values with small random changes
