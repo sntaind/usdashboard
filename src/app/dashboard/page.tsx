@@ -641,11 +641,32 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
   
   const [value, setValue] = useState<number>(initialValue);
   const [change, setChange] = useState<number>(initialChange);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [lastUpdate, setLastUpdate] = useState<number>(0);
 
   useEffect(() => {
     console.log(`🔄 MarketIndicator useEffect triggered for ${symbol}`);
     
     const fetchData = async () => {
+      // Check cache first (5 minutes cache)
+      const cacheKey = `market_${symbol}`;
+      const cached = localStorage.getItem(cacheKey);
+      const now = Date.now();
+      
+      if (cached) {
+        try {
+          const cachedData = JSON.parse(cached);
+          if (now - cachedData.timestamp < 300000) { // 5 minutes
+            console.log(`📦 Using cached data for ${symbol}: ${cachedData.value}`);
+            setValue(cachedData.value);
+            setChange(cachedData.change);
+            setIsLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.log(`⚠️ Cache parse error for ${symbol}`);
+        }
+      }
       try {
         console.log(`🌐 Fetching ${symbol} from multiple sources`);
         
@@ -692,9 +713,9 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
               throw new Error('BTC API failed');
             }
           } catch (e) {
-            // Fallback to simulated data
-            value = 160000000 + (Math.random() - 0.5) * 10000000;
-            change = (Math.random() - 0.5) * 5;
+            // Fallback to stable data
+            value = 165000000; // Stable fallback
+            change = 2.5;
           }
         } else if (symbol === 'USDKRW') {
           try {
@@ -711,10 +732,10 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
             } else {
               value = 1429;
             }
-            change = (Math.random() - 0.5) * 0.5; // Small random change
+                change = 0.15; // Stable change
           } catch (e) {
-            value = 1429;
-            change = (Math.random() - 0.5) * 0.5;
+            value = 1435;
+            change = 0.15; // Stable change
           }
         } else if (symbol === 'GOLD') {
           try {
@@ -733,9 +754,9 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
               throw new Error('Gold API failed');
             }
           } catch (e) {
-            // Fallback to simulated data
-            value = 2650 + (Math.random() - 0.5) * 100;
-            change = (Math.random() - 0.5) * 2;
+            // Fallback to stable data
+            value = 2700; // Stable fallback
+            change = 0.8;
           }
         } else if (symbol === 'DXY') {
           try {
@@ -780,7 +801,7 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
                     const latestValue = data.observations[0].value;
                     if (latestValue !== '.' && parseFloat(latestValue) > 90 && parseFloat(latestValue) < 110) {
                       value = parseFloat(latestValue);
-                      change = (Math.random() - 0.5) * 0.5;
+                      change = 0.25; // Stable change
                       console.log(`✅ FRED DXY: ${value}`);
                       break;
                     }
@@ -794,7 +815,7 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
                     const price = parseFloat(latestData['1. open']);
                     if (price > 90 && price < 110) {
                       value = price;
-                      change = (Math.random() - 0.5) * 0.5;
+                      change = 0.25; // Stable change
                       console.log(`✅ Alpha Vantage DXY: ${value}`);
                       break;
                     }
@@ -810,9 +831,9 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
               throw new Error('All DXY APIs failed');
             }
           } catch (e) {
-            // Fallback to realistic value
-            value = 98.6 + (Math.random() - 0.5) * 2;
-            change = (Math.random() - 0.5) * 0.5;
+            // Fallback to stable value
+            value = 98.6; // Stable fallback
+            change = 0.25;
             console.log(`⚠️ DXY fallback: ${value}`);
           }
         } else if (symbol === 'NDX') {
@@ -847,9 +868,9 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
               throw new Error('Yahoo Finance NDX API failed');
             }
           } catch (e) {
-            // Fallback to realistic value
-            value = 19800 + (Math.random() - 0.5) * 1000;
-            change = (Math.random() - 0.5) * 2;
+            // Fallback to stable value
+            value = 19800; // Stable fallback
+            change = 0.85;
             console.log(`⚠️ NDX fallback: ${value}`);
           }
         } else if (symbol === 'SPX') {
@@ -884,9 +905,9 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
               throw new Error('Yahoo Finance SPX API failed');
             }
           } catch (e) {
-            // Fallback to realistic value
-            value = 6100 + (Math.random() - 0.5) * 200;
-            change = (Math.random() - 0.5) * 2;
+            // Fallback to stable value
+            value = 6100; // Stable fallback
+            change = 0.45;
             console.log(`⚠️ SPX fallback: ${value}`);
           }
         } else if (symbol === 'VIX') {
@@ -921,9 +942,9 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
               throw new Error('Yahoo Finance VIX API failed');
             }
           } catch (e) {
-            // Fallback to realistic value
-            value = 12.5 + (Math.random() - 0.5) * 2;
-            change = (Math.random() - 0.5) * 2;
+            // Fallback to stable value
+            value = 12.5; // Stable fallback
+            change = -1.7;
             console.log(`⚠️ VIX fallback: ${value}`);
           }
         } else if (symbol === 'KOSPI') {
@@ -956,15 +977,15 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
               }
             } else {
               throw new Error('Yahoo Finance KOSPI API failed');
-            }
+          }
           } catch (e) {
-            // Fallback to realistic value
-            value = 2750 + (Math.random() - 0.5) * 100;
-            change = (Math.random() - 0.5) * 2;
+            // Fallback to stable value
+            value = 2750; // Stable fallback
+            change = 1.2;
             console.log(`⚠️ KOSPI fallback: ${value}`);
           }
         } else {
-          // For other symbols, simulate realistic values with small random changes
+          // For other symbols, use stable values
           const baseValues: { [key: string]: number } = {
             NDX: 19800,  // 최근 나스닥 상승 반영
             SPX: 6100,   // 최근 S&P 상승 반영
@@ -973,9 +994,8 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
           };
           
           const baseValue = baseValues[symbol] || 100;
-          const randomChange = (Math.random() - 0.5) * 2; // -1% to +1%
-          value = baseValue * (1 + randomChange / 100);
-          change = randomChange;
+          value = baseValue; // Stable value
+          change = 0; // No random change
         }
 
         // Round to 2 decimal places for most symbols, but keep integers for large values
@@ -985,16 +1005,28 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
 
         setValue(roundedValue);
         setChange(parseFloat(change.toFixed(2)));
+        setIsLoading(false);
+        setLastUpdate(now);
+        
+        // Cache the result
+        const cacheData = {
+          value: roundedValue,
+          change: parseFloat(change.toFixed(2)),
+          timestamp: now
+        };
+        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+        
         console.log(`✅ Real-time: ${symbol} = ${roundedValue} (${change.toFixed(2)}%)`);
       } catch (e) {
         console.error(`❌ Failed to fetch ${symbol}:`, e);
+        setIsLoading(false);
         // Keep fallback values on error
       }
     };
 
-    // Fetch immediately and then every 30 seconds for better real-time feel
+    // Fetch immediately and then every 2 minutes to reduce API calls
     fetchData();
-    const interval = setInterval(fetchData, 30000);
+    const interval = setInterval(fetchData, 120000); // 2 minutes
     return () => clearInterval(interval);
   }, [symbol]);
 
@@ -1004,7 +1036,9 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
       border: "0.5px solid #fff",
       padding: "6px 8px",
       width: "70px",
-      height: "60px"
+      height: "60px",
+      opacity: isLoading ? 0.7 : 1,
+      transition: "opacity 0.3s ease"
     }}>
       <div className="text-xs font-mono uppercase" style={{ 
         letterSpacing: "0.05em",
@@ -1014,21 +1048,25 @@ function MarketIndicator({ symbol, name, tvSymbol, showValue = true }: { symbol:
         width: "100%",
         textAlign: "center"
       }}>{name}</div>
-          {showValue ? (
-            <div className="text-sm font-mono font-semibold">
-              {symbol === 'BTC' 
-                ? `${(value / 100000000).toFixed(2)}억` 
-                : symbol === 'USDKRW'
-                ? Math.round(value).toLocaleString()
-                : symbol === 'DXY' || symbol === 'VIX' || symbol === 'GOLD'
-                ? value.toFixed(2)
-                : Math.round(value).toLocaleString()}
-            </div>
-          ) : (
-            <div className="text-sm font-mono font-semibold">
-              {change >= 0 ? '+' : ''}{change.toFixed(2)}%
-            </div>
-          )}
+      {isLoading ? (
+        <div className="text-xs font-mono" style={{ color: "#888" }}>
+          ...
+        </div>
+      ) : showValue ? (
+        <div className="text-sm font-mono font-semibold">
+          {symbol === 'BTC' 
+            ? `${(value / 100000000).toFixed(2)}억` 
+            : symbol === 'USDKRW'
+            ? Math.round(value).toLocaleString()
+            : symbol === 'DXY' || symbol === 'VIX' || symbol === 'GOLD'
+            ? value.toFixed(2)
+            : Math.round(value).toLocaleString()}
+        </div>
+      ) : (
+        <div className="text-sm font-mono font-semibold">
+          {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+        </div>
+      )}
     </div>
   );
 }
